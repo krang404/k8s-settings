@@ -1,0 +1,3 @@
+kubespray/rpn/artifacts/admin.conf
+kubespray/rpn/credentials/kubeadm_certificate_key.creds
+playbooks/ansible.cfg

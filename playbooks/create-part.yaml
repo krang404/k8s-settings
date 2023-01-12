@@ -1,0 +1,31 @@
+---
+- name: Create Partision
+  hosts: k8s
+  become: true
+  tasks:
+
+    - name: Create a new primary partition
+      parted:
+        device: /dev/disk/by-id/virtio-disk-data
+        number: 1
+        label: gpt
+        state: present
+
+    - name: Create a new filesystem in new partition
+      filesystem:
+        fstype: ext4
+        dev: /dev/disk/by-id/virtio-disk-data-part1
+
+    - name: Create a mounting point for data disk
+      file:
+        path: /hdd
+        state: directory
+
+    - name: Mounting disk data to fstab
+      lineinfile:
+        dest: /etc/fstab
+        line: /dev/disk/by-id/virtio-disk-data-part1 /hdd ext4 defaults
+        state: present
+
+    - name: Rebooting for testing and automounting
+      reboot:
