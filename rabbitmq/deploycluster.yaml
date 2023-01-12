@@ -1,0 +1,47 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  labels:
+    app: rabbitmq
+  name: rabbitmq
+  namespace: exchange-listener
+spec:
+  affinity:
+     nodeAffinity:
+       requiredDuringSchedulingIgnoredDuringExecution:
+         nodeSelectorTerms:
+         - matchExpressions:
+           - key: kubernetes.io/hostname
+             operator: In
+             values:
+             - k8sm00
+             - k8sm01
+             - k8sm02
+             - k8sw00
+  replicas: 3
+  image: rabbitmq:3.11.6
+  service:
+    type: ClusterIP
+  persistence:
+    storageClassName: local-storage
+    storage: 10Gi
+  resources:
+    requests:
+      cpu: 256m
+      memory: 1Gi
+    limits:
+      cpu: 256m
+      memory: 1Gi
+  rabbitmq:
+    additionalConfig: |
+      cluster_formation.peer_discovery_backend = rabbit_peer_discovery_k8s
+      cluster_formation.k8s.host = kubernetes.default.svc.cluster.local
+      cluster_formation.k8s.address_type = hostname
+      vm_memory_high_watermark_paging_ratio = 0.85
+      cluster_formation.node_cleanup.interval = 10
+      cluster_partition_handling = autoheal
+      queue_master_locator = min-masters
+      loopback_users.guest = false
+      default_user = guest
+      default_pass = guest
+    advancedConfig: ""
