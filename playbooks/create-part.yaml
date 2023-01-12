@@ -1,6 +1,6 @@
 ---
 - name: Create Partision
-  hosts: k8s
+  hosts: all
   become: true
   tasks:
 
