@@ -101,7 +101,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: localpv-local-volume-static-provisioner
-  namespace: local-pv
+  namespace: exchange-listener
   labels:
     helm.sh/chart: local-volume-static-provisioner-1.0.0
     app.kubernetes.io/name: local-volume-static-provisioner
