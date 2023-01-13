@@ -28,8 +28,8 @@ data:
   minResyncPeriod: "10s"
   storageClassMap: |
     fast-disks:
-      hostDir: /hdd
-      mountDir: /hdd
+      hostDir: /hdd/
+      mountDir: /hdd/
       blockCleanerCommand:
         - "/scripts/shred.sh"
         - "2"
@@ -153,7 +153,7 @@ spec:
             - name: provisioner-dev
               mountPath: /dev
             - name: fast-disks
-              mountPath: /hdd
+              mountPath: /hdd/
               mountPropagation: HostToContainer
       volumes:
         - name: provisioner-config
@@ -164,4 +164,4 @@ spec:
             path: /dev
         - name: fast-disks
           hostPath:
-            path: /hdd
+            path: /hdd/
