@@ -27,8 +27,8 @@ data:
     pv-labels : can-be-selected
   storageClassMap: |
     fast-disks:
-      hostDir: /hdd
-      mountDir: /hdd
+      hostDir: /mnt/disks
+      mountDir: /mnt/disks
       blockCleanerCommand:
         - "/scripts/shred.sh"
         - "2"
@@ -48,7 +48,7 @@ metadata:
     app.kubernetes.io/instance: localpv
 provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
-reclaimPolicy: Delete
+reclaimPolicy: Retain
 ---
 # Source: local-volume-static-provisioner/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -118,13 +118,13 @@ spec:
         app.kubernetes.io/name: local-volume-static-provisioner
         app.kubernetes.io/instance: localpv
       annotations:
-        checksum/config: 66812092c46cf9a9cf82226e0bd647c1b44f0db9a081788371db92656d6f9341
+        checksum/config: 08f6df13a924a771f1731403547667d867fc6e734cfcf8e73454f0130398dd1e
     spec:
       serviceAccountName: local-storage-admin
       nodeSelector:
         kubernetes.io/os: linux
       tolerations:
-        - operator: Exists
+      - operator: Exists
       containers:
         - name: provisioner
           image: k8s.gcr.io/sig-storage/local-volume-provisioner:v2.4.0
@@ -152,7 +152,7 @@ spec:
             - name: provisioner-dev
               mountPath: /dev
             - name: fast-disks
-              mountPath: /hdd
+              mountPath: /mnt/disks
               mountPropagation: HostToContainer
       volumes:
         - name: provisioner-config
@@ -163,4 +163,4 @@ spec:
             path: /dev
         - name: fast-disks
           hostPath:
-            path: /hdd
+            path: /mnt/disks
