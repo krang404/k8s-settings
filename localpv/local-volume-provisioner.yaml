@@ -25,6 +25,7 @@ metadata:
 data:
   labelsForPV: |
     pv-labels : can-be-selected
+  minResyncPeriod: "10s"
   storageClassMap: |
     fast-disks:
       hostDir: /hdd
@@ -118,25 +119,13 @@ spec:
         app.kubernetes.io/name: local-volume-static-provisioner
         app.kubernetes.io/instance: localpv
       annotations:
-        checksum/config: d64a1ddfbf72d420214c98191b23d0be6704591ea515fdf8019012fb5f9239ff
+        checksum/config: 2c914f2d2579ac4077fedc3ff527ad577223049631f6422d9c5e79442e1409f4
     spec:
       serviceAccountName: local-storage-admin
       nodeSelector:
         kubernetes.io/os: linux
       tolerations:
       - operator: Exists
-      # affinity:
-      #   nodeAffinity:
-      #     requiredDuringSchedulingIgnoredDuringExecution:
-      #       nodeSelectorTerms:
-      #       - matchExpressions:
-      #         - key: kubernetes.io/hostname
-      #           operator: In
-      #           values:
-      #           - k8sm00
-      #           - k8sm01
-      #           - k8sm02
-      #           - k8sw00
       containers:
         - name: provisioner
           image: k8s.gcr.io/sig-storage/local-volume-provisioner:v2.4.0
