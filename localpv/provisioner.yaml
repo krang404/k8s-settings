@@ -31,15 +31,15 @@ spec:
       labels:
         app: local-volume-provisioner
     spec:
-      tolerations:
-      # these tolerations are to have the daemonset runnable on control plane nodes
-      # remove them if your control plane nodes should not run pods
-      - key: node-role.kubernetes.io/control-plane
-        operator: Exists
-        effect: NoSchedule
-      - key: node-role.kubernetes.io/master
-        operator: Exists
-        effect: NoSchedule
+      # tolerations:
+      # # these tolerations are to have the daemonset runnable on control plane nodes
+      # # remove them if your control plane nodes should not run pods
+      # - key: node-role.kubernetes.io/control-plane
+      #   operator: Exists
+      #   effect: NoSchedule
+      # - key: node-role.kubernetes.io/master
+      #   operator: Exists
+      #   effect: NoSchedule
       serviceAccountName: local-storage-admin
       containers:
         - image: "registry.k8s.io/sig-storage/local-volume-provisioner:v2.4.0"
