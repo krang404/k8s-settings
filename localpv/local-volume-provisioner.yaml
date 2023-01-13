@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: local-storage-admin
-  namespace: local-pv
+  namespace: exchange-listener
   labels:
     helm.sh/chart: local-volume-static-provisioner-1.0.0
     app.kubernetes.io/name: local-volume-static-provisioner
@@ -16,7 +16,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: localpv-local-volume-static-provisioner-config
-  namespace: local-pv
+  namespace: exchange-listener
   labels:
     helm.sh/chart: local-volume-static-provisioner-1.0.0
     app.kubernetes.io/name: local-volume-static-provisioner
@@ -90,7 +90,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: local-storage-admin
-  namespace: local-pv
+  namespace: exchange-listener
 roleRef:
   kind: ClusterRole
   name: localpv-local-volume-static-provisioner-node-clusterrole
