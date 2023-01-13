@@ -23,7 +23,7 @@ spec:
   service:
     type: ClusterIP
   persistence:
-    storageClassName: local-storage
+    storageClassName: fast-disks
     storage: 10Gi
   resources:
     requests:
