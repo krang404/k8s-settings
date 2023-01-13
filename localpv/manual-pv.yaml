@@ -22,5 +22,3 @@ spec:
           - k8sm01
           - k8sm02
           - k8sw00
-  tolerations:
-  - operator: Exists
