@@ -24,7 +24,7 @@ spec:
     type: ClusterIP
   persistence:
     storageClassName: fast-disks
-    storage: 8Gi
+    storage: 9978Mi
   resources:
     requests:
       cpu: 256m
