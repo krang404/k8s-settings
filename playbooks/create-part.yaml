@@ -4,6 +4,24 @@
   become: true
   tasks:
 
+    - name: Delete primary partition
+      parted:
+        device: /dev/vdb
+        number: 1
+        state: absent
+
+    - name: Delete secondary partition
+      parted:
+        device: /dev/vdb
+        number: 2
+        state: absent
+
+    - name: Delete thirdary partition
+      parted:
+        device: /dev/vdb
+        number: 3
+        state: absent
+
     - name: Create a new primary partition
       parted:
         device: /dev/vdb
@@ -46,35 +64,35 @@
 
     - name: Create a mounting point for data disk
       file:
-        path: /mnt/disks/vdb1
+        path: /mnt/disks/fast-disks/vdb1
         state: directory
 
     - name: Create a mounting point for data disk
       file:
-        path: /mnt/disks/vdb2
+        path: /mnt/disks/redis-disks/vdb2
         state: directory
 
     - name: Create a mounting point for data disk
       file:
-        path: /mnt/disks/vdb3
+        path: /mnt/disks/elastik-disks/vdb3
         state: directory
 
     - name: Mounting disk data to fstab
       lineinfile:
         dest: /etc/fstab
-        line: /dev/vdb1 /mnt/disks/vdb1 ext4 defaults
+        line: /dev/vdb1 /mnt/disks/fast-disks/vdb1 ext4 defaults
         state: present
 
     - name: Mounting disk data to fstab
       lineinfile:
         dest: /etc/fstab
-        line: /dev/vdb2 /mnt/disks/vdb2 ext4 defaults
+        line: /dev/vdb2 /mnt/disks/redis-disks/vdb2 ext4 defaults
         state: present
 
     - name: Mounting disk data to fstab
       lineinfile:
         dest: /etc/fstab
-        line: /dev/vdb3 /mnt/disks/vdb3 ext4 defaults
+        line: /dev/vdb3 /mnt/disks/elastik-disks/vdb3 ext4 defaults
         state: present
 
 

@@ -27,14 +27,33 @@ data:
     pv-labels : can-be-selected
   storageClassMap: |
     fast-disks:
-      hostDir: /mnt/disks
-      mountDir: /mnt/disks
+      hostDir: /mnt/disks/fast-disks
+      mountDir: /mnt/disks/fast-disks
       blockCleanerCommand:
         - "/scripts/shred.sh"
         - "2"
       volumeMode: Filesystem
       fsType: ext4
       namePattern: "*"
+    redis-disks:
+      hostDir: /mnt/disks/redis-disks
+      mountDir: /mnt/disks/redis-disks
+      blockCleanerCommand:
+        - "/scripts/shred.sh"
+        - "2"
+      volumeMode: Filesystem
+      fsType: ext4
+      namePattern: "*"
+    elastik-disks:
+      hostDir: /mnt/disks/elastik-disks/
+      mountDir: /mnt/disks/elastik-disks/
+      blockCleanerCommand:
+        - "/scripts/shred.sh"
+        - "2"
+      volumeMode: Filesystem
+      fsType: ext4
+      namePattern: "*"
+
 ---
 # Source: local-volume-static-provisioner/templates/storageclass.yaml
 apiVersion: storage.k8s.io/v1
