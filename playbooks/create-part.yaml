@@ -4,31 +4,13 @@
   become: true
   tasks:
 
-    - name: Delete primary partition
-      parted:
-        device: /dev/vdb
-        number: 1
-        state: absent
-
-    - name: Delete secondary partition
-      parted:
-        device: /dev/vdb
-        number: 2
-        state: absent
-
-    - name: Delete thirdary partition
-      parted:
-        device: /dev/vdb
-        number: 3
-        state: absent
-
     - name: Create a new primary partition
       parted:
         device: /dev/vdb
         number: 1
         label: gpt
         state: present
-        part_end: 10GiB
+        part_end: 11GiB
 
     - name: Create a new secondary partition
       parted:
@@ -36,8 +18,8 @@
         number: 2
         label: gpt
         state: present
-        part_start: 10GiB
-        part_end: 25GiB
+        part_start: 11GiB
+        part_end: 26GiB
 
     - name: Create a new thirdary partition
       parted:
@@ -45,7 +27,7 @@
         number: 3
         label: gpt
         state: present
-        part_start: 25GiB
+        part_start: 26GiB
 
     - name: Create a new filesystem in new partition
       filesystem:
