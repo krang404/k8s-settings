@@ -18,7 +18,8 @@
         number: 2
         label: gpt
         state: present
-        part_end: 15GiB
+        part_start: 10GiB
+        part_end: 25GiB
 
     - name: Create a new thirdary partition
       parted:
@@ -26,6 +27,7 @@
         number: 3
         label: gpt
         state: present
+        part_start: 25GiB
 
     - name: Create a new filesystem in new partition
       filesystem:
