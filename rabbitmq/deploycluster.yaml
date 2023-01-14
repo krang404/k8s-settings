@@ -46,10 +46,8 @@ spec:
       cluster_formation.node_cleanup.only_log_warning = true
       cluster_partition_handling = autoheal
       queue_master_locator=min-masters
-      cluster_formation.randomized_startup_delay_range.min = 0
-      cluster_formation.randomized_startup_delay_range.max = 2
-      cluster_formation.k8s.service_name = rabbitmq-internal
-      cluster_formation.k8s.hostname_suffix = .rabbitmq-internal.exchange-listener.svc.cluster.local
+      cluster_formation.k8s.service_name = rabbitmq-pods
+      cluster_formation.k8s.hostname_suffix = .rabbitmq-pods.exchange-listener.svc.cluster.local
       loopback_users.guest = false
       default_user = guest
       default_pass = guest
