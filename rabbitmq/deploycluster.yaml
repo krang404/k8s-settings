@@ -24,7 +24,7 @@ spec:
     type: ClusterIP
   persistence:
     storageClassName: fast-disks
-    storage: 10Gi
+    storage: 9978Mi
   resources:
     requests:
       cpu: 256m
@@ -34,14 +34,7 @@ spec:
       memory: 1Gi
   rabbitmq:
     additionalConfig: |
-      cluster_formation.peer_discovery_backend = rabbit_peer_discovery_k8s
-      cluster_formation.k8s.host = kubernetes.default.svc.cluster.local
-      cluster_formation.k8s.address_type = hostname
-      vm_memory_high_watermark_paging_ratio = 0.85
-      cluster_formation.node_cleanup.interval = 10
-      cluster_partition_handling = autoheal
-      queue_master_locator = min-masters
-      loopback_users.guest = false
-      default_user = guest
-      default_pass = guest
+                 log.console.level = info
+                 channel_max = 1700
+                 default_user_tags.administrator = true
     advancedConfig: ""
