@@ -10,22 +10,71 @@
         number: 1
         label: gpt
         state: present
+        part_end: 10GiB
+
+    - name: Create a new secondary partition
+      parted:
+        device: /dev/vdb
+        number: 2
+        label: gpt
+        state: present
+        part_end: 15GiB
+
+    - name: Create a new thirdary partition
+      parted:
+        device: /dev/vdb
+        number: 3
+        label: gpt
+        state: present
 
     - name: Create a new filesystem in new partition
       filesystem:
         fstype: ext4
         dev: /dev/vdb1
 
+    - name: Create a new filesystem in new partition
+      filesystem:
+        fstype: ext4
+        dev: /dev/vdb2
+
+    - name: Create a new filesystem in new partition
+      filesystem:
+        fstype: ext4
+        dev: /dev/vdb3
+
     - name: Create a mounting point for data disk
       file:
-        path: /hdd
+        path: /mnt/disks/vdb1
+        state: directory
+
+    - name: Create a mounting point for data disk
+      file:
+        path: /mnt/disks/vdb2
+        state: directory
+
+    - name: Create a mounting point for data disk
+      file:
+        path: /mnt/disks/vdb3
         state: directory
 
     - name: Mounting disk data to fstab
       lineinfile:
         dest: /etc/fstab
-        line: /dev/vdb1 /hdd ext4 defaults
+        line: /dev/vdb1 /mnt/disks/vdb1 ext4 defaults
         state: present
+
+    - name: Mounting disk data to fstab
+      lineinfile:
+        dest: /etc/fstab
+        line: /dev/vdb2 /mnt/disks/vdb2 ext4 defaults
+        state: present
+
+    - name: Mounting disk data to fstab
+      lineinfile:
+        dest: /etc/fstab
+        line: /dev/vdb3 /mnt/disks/vdb3 ext4 defaults
+        state: present
+
 
     - name: Rebooting for testing and automounting
       reboot:
