@@ -28,10 +28,10 @@ spec:
   resources:
     requests:
       cpu: 256m
-      memory: 1Gi
+      memory: 2Gi
     limits:
-      cpu: 256m
-      memory: 1Gi
+      cpu: 500m
+      memory: 4Gi
   rabbitmq:
     additionalPlugins:
       - rabbitmq_management
