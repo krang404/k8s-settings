@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: local-storage-admin
-  namespace: exchange-listener
+  namespace: kube-system
   labels:
     helm.sh/chart: local-volume-static-provisioner-1.0.0
     app.kubernetes.io/name: local-volume-static-provisioner
@@ -16,7 +16,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: localpv-local-volume-static-provisioner-config
-  namespace: exchange-listener
+  namespace: kube-system
   labels:
     helm.sh/chart: local-volume-static-provisioner-1.0.0
     app.kubernetes.io/name: local-volume-static-provisioner
@@ -45,21 +45,48 @@ data:
       fsType: ext4
       namePattern: "*"
     elastik-disks:
-      hostDir: /mnt/disks/elastik-disks/
-      mountDir: /mnt/disks/elastik-disks/
+      hostDir: /mnt/disks/elastik-disks
+      mountDir: /mnt/disks/elastik-disks
       blockCleanerCommand:
         - "/scripts/shred.sh"
         - "2"
       volumeMode: Filesystem
       fsType: ext4
       namePattern: "*"
-
 ---
 # Source: local-volume-static-provisioner/templates/storageclass.yaml
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: fast-disks
+  labels:
+    helm.sh/chart: local-volume-static-provisioner-1.0.0
+    app.kubernetes.io/name: local-volume-static-provisioner
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: localpv
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
+---
+# Source: local-volume-static-provisioner/templates/storageclass.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: redis-disks
+  labels:
+    helm.sh/chart: local-volume-static-provisioner-1.0.0
+    app.kubernetes.io/name: local-volume-static-provisioner
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: localpv
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
+---
+# Source: local-volume-static-provisioner/templates/storageclass.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: elastik-disks
   labels:
     helm.sh/chart: local-volume-static-provisioner-1.0.0
     app.kubernetes.io/name: local-volume-static-provisioner
@@ -109,7 +136,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: local-storage-admin
-  namespace: exchange-listener
+  namespace: kube-system
 roleRef:
   kind: ClusterRole
   name: localpv-local-volume-static-provisioner-node-clusterrole
@@ -120,7 +147,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: localpv-local-volume-static-provisioner
-  namespace: exchange-listener
+  namespace: kube-system
   labels:
     helm.sh/chart: local-volume-static-provisioner-1.0.0
     app.kubernetes.io/name: local-volume-static-provisioner
@@ -137,13 +164,13 @@ spec:
         app.kubernetes.io/name: local-volume-static-provisioner
         app.kubernetes.io/instance: localpv
       annotations:
-        checksum/config: 08f6df13a924a771f1731403547667d867fc6e734cfcf8e73454f0130398dd1e
+        checksum/config: 706e72e138eb8b5dd85fbdbbfdd3628f645a1f4731a98fb40e6de00ba079d988
     spec:
       serviceAccountName: local-storage-admin
       nodeSelector:
         kubernetes.io/os: linux
-      tolerations:
-      - operator: Exists
+      tolerations:    
+        - operator: Exists
       containers:
         - name: provisioner
           image: k8s.gcr.io/sig-storage/local-volume-provisioner:v2.4.0
@@ -171,7 +198,13 @@ spec:
             - name: provisioner-dev
               mountPath: /dev
             - name: fast-disks
-              mountPath: /mnt/disks
+              mountPath: /mnt/disks/fast-disks
+              mountPropagation: HostToContainer
+            - name: redis-disks
+              mountPath: /mnt/disks/redis-disks
+              mountPropagation: HostToContainer
+            - name: elastik-disks
+              mountPath: /mnt/disks/elastik-disks
               mountPropagation: HostToContainer
       volumes:
         - name: provisioner-config
@@ -182,4 +215,10 @@ spec:
             path: /dev
         - name: fast-disks
           hostPath:
-            path: /mnt/disks
+            path: /mnt/disks/fast-disks
+        - name: redis-disks
+          hostPath:
+            path: /mnt/disks/redis-disks
+        - name: elastik-disks
+          hostPath:
+            path: /mnt/disks/elastik-disks
