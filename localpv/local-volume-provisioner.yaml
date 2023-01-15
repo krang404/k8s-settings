@@ -169,7 +169,7 @@ spec:
       serviceAccountName: local-storage-admin
       nodeSelector:
         kubernetes.io/os: linux
-      tolerations:    
+      tolerations:
         - operator: Exists
       containers:
         - name: provisioner
