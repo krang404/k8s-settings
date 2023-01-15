@@ -18,6 +18,8 @@ spec:
              - k8sm01
              - k8sm02
              - k8sw00
+  tolerations:
+    - operator: Exists
   replicas: 3
   image: rabbitmq:3.11.6
   service:
