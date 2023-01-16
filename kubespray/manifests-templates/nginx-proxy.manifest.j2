@@ -13,9 +13,19 @@ spec:
   dnsPolicy: ClusterFirstWithHostNet
   nodeSelector:
     kubernetes.io/os: linux
-  tolerations:
-    - operator: Exists  
-  priorityClassName: system-node-critical
+  affinity:
+     nodeAffinity:
+       requiredDuringSchedulingIgnoredDuringExecution:
+         nodeSelectorTerms:
+         - matchExpressions:
+           - key: kubernetes.io/hostname
+             operator: In
+             values:
+             - k8sm00
+             - k8sm01
+             - k8sm02
+             - k8sw00
+  priorityClassName: system-cluster-critical
   containers:
   - name: nginx-proxy
     image: {{ nginx_image_repo }}:{{ nginx_image_tag }}
