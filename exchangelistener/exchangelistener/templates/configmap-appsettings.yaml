@@ -1,0 +1,87 @@
+{{- $rabbitmqEnabled := eq (include "rabbitmq.enabled" .) "true" -}}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-appsettings
+data:
+  appSettings: |
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Debug",
+          "System": "Warning",
+          "Microsoft": "Error"
+        },
+        "Console":{
+          "IncludeScopes": true
+        }
+      },
+      "MetricsWebTrackingOptions": {
+        "ApdexTrackingEnabled": false,
+        "IgnoredHttpStatusCodes": [ 404 ],
+        "IgnoredRoutesRegexPatterns": [],
+        "OAuth2TrackingEnabled": false
+      },
+      "MetricEndpointsOptions": {
+        "MetricsEndpointEnabled": false,
+        "MetricsTextEndpointEnabled": false,
+        "EnvironmentInfoEndpointEnabled": false
+{{- if $rabbitmqEnabled }}
+      },
+      "WorkerAssemblyMask": "Listener.WorkerHost.dll",
+      "Worker": {
+        "ThreadConsumer": 1,
+        "ConsumerTimerInterval": 1000,
+        "PrefetchSize": 0,
+        "PrefetchCount": 1,
+        "MaxAtemptProcessingCount": 5,
+        "MessagesDownloadQueueName": "{{ .Values.RabbitMQ.QueueName }}",
+        "DefaultMaxAttemptsToPublishCount": "{{ .Values.RabbitMQ.DefaultMaxAttemptsToPublishCount | default 10 }}"
+      },
+      "RabbitMQSettings": {
+        "APIUrl": "{{ include "rabbitmq.apiUrl" . }}",
+        "VirtualHost": "{{ .Values.RabbitMQ.VirtualHost }}",
+        "Exchanges": {
+          "{{ .Values.RabbitMQ.ExchangeName }}": {
+            "Type": "direct"
+          }
+        },
+        "Queues": {
+          "{{ .Values.RabbitMQ.QueueName }}": {
+            "Exchange": "{{ .Values.RabbitMQ.ExchangeName }}",
+            "RoutingKey": "{{ .Values.RabbitMQ.QueueName }}",
+            "Arguments": {
+              "x-max-priority": "{{ .Values.RabbitMQ.XMaxPriority | default 3 }}"
+            }
+          }
+        }
+{{- end }}
+{{- if (contains  "rhel" .Values.image.repository ) }}
+    },
+    "System": {
+        "UseSocketsHttpHandler":  false
+{{- end }}
+{{- if (not (empty .Values.Redis.Connection)) }}
+    },
+    "ConnectionStrings": {
+        "Redis":  "{{ .Values.Redis.Connection }}"
+{{- end }}
+{{- if (not (empty .Values.EWS)) }}
+      },
+      "EWS": {
+      {{- range $key, $val := .Values.EWS }}
+        {{ $key | quote }}: {{ $val | quote }},
+      {{- end }}
+{{- end }}
+{{- if (not (empty .Values.Features)) }}
+      },
+      "Features": {
+      {{- range $key, $val := .Values.Features }}
+        {{ $key | quote }}: {{ $val | quote }},
+      {{- end }}
+      }
+{{- else }}
+      }
+{{- end }}
+    }
+

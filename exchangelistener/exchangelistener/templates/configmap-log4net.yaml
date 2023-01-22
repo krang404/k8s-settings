@@ -1,0 +1,65 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-log4net
+data:
+  log4net.config: |
+      <?xml version="1.0" encoding="utf-8"?>
+      <log4net>
+          <appender name="ConsoleAppender" type="log4net.Appender.ConsoleAppender">
+              <layout type="log4net.Layout.PatternLayout">
+                  <conversionPattern value="%date [%thread] %-5level: %message%newline%exception" />
+              </layout>
+              <filter type="log4net.Filter.LoggerMatchFilter">
+                <loggerToMatch value="Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker" />
+                <acceptOnMatch value="false" />
+              </filter>
+              <filter type="log4net.Filter.LoggerMatchFilter">
+                <loggerToMatch value="Microsoft.AspNetCore.Hosting.Internal.WebHost" />
+                <acceptOnMatch value="false" />
+              </filter>
+              <filter type="log4net.Filter.LoggerMatchFilter">
+                <loggerToMatch value="Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService" />
+                <acceptOnMatch value="false" />
+              </filter>
+              <filter type="log4net.Filter.LoggerMatchFilter">
+                <loggerToMatch value="Microsoft.AspNetCore.Mvc.Infrastructure.ObjectResultExecutor" />
+                <acceptOnMatch value="false" />
+              </filter>
+          </appender>
+{{- if (and (not (empty .Values.GrayLog.AMQP.host)) (not (empty .Values.GrayLog.AMQP.userName)) (not (empty .Values.GrayLog.AMQP.password))) }}
+          <appender name="ExchangeListenerGelfAmqpAppender" type="Gelf4Net.Appender.AsyncGelfAmqpAppender, Gelf4Net.AmqpAppender">
+              <remoteAddress value="{{ .Values.GrayLog.AMQP.host }}" />
+              <remotePort value="{{ .Values.GrayLog.AMQP.port }}" />
+              <username value="{{ .Values.GrayLog.AMQP.userName }}" />
+              <password value="{{ .Values.GrayLog.AMQP.password }}" />
+              <virtualHost value="{{ .Values.GrayLog.AMQP.virtualHost }}" />
+              <exchange value="{{ .Values.GrayLog.AMQP.exchange }}" />
+              <key value="{{ .Values.GrayLog.AMQP.routingKey }}" />
+              <layout type="Gelf4Net.Layout.GelfLayout, Gelf4Net.Core">
+                  <param name="AdditionalFields" value="app:GelfAmqpAppender,version:1.0,Level:%level" />
+                  <param name="Facility" value="ExchangeListener" />
+                  <param name="IncludeLocationInformation" value="true" />
+              </layout>
+              <filter type="log4net.Filter.LoggerMatchFilter">
+                <loggerToMatch value="Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker" />
+                <acceptOnMatch value="false" />
+              </filter>
+              <filter type="log4net.Filter.LoggerMatchFilter">
+                <loggerToMatch value="Microsoft.AspNetCore.Hosting.Internal.WebHost" />
+                <acceptOnMatch value="false" />
+              </filter>
+              <filter type="log4net.Filter.LoggerMatchFilter">
+                <loggerToMatch value="Microsoft.AspNetCore.Mvc.Infrastructure.ObjectResultExecutor" />
+                <acceptOnMatch value="false" />
+              </filter>
+          </appender>
+{{- end }}
+          <root>
+              <level value="{{ .Values.log4Net.level }}" />
+              <appender-ref ref="ConsoleAppender" />
+{{- if (and (not (empty .Values.GrayLog.AMQP.host)) (not (empty .Values.GrayLog.AMQP.userName)) (not (empty .Values.GrayLog.AMQP.password))) }}
+              <appender-ref ref="ExchangeListenerGelfAmqpAppender" />
+{{- end }}
+          </root>
+      </log4net>

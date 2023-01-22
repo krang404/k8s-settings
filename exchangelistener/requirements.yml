@@ -1,0 +1,7 @@
+---
+dependencies:
+
+  - name: exchangelistener
+    version: "0.8.74"
+    repository: "file://exchangelistener"
+...

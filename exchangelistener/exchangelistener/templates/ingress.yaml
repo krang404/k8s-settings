@@ -1,0 +1,48 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := .Release.Name -}}
+{{- $servicePort := .Values.service.port -}}
+{{- $ingressPath := .Values.ingress.path -}}
+{{- $ingressApiIsStable := eq (include "ingress.isStable" .) "true" -}}
+{{- $ingressSupportsIngressClassName := eq (include "ingress.supportsIngressClassName" .) "true" -}}
+{{- $ingressSupportsPathType := eq (include "ingress.supportsPathType" .) "true" -}}
+{{- $ingressPathType := .Values.ingress.pathType -}}
+apiVersion: {{ template "ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-api
+  labels:
+    app: {{ $fullName }}-api
+    chart: {{ template "exchangelistener.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- with .Values.ingress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  {{- if and $ingressSupportsIngressClassName .Values.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
+  tls:
+{{ toYaml .Values.ingress.tls | indent 4 }}
+  {{- end }}
+  rules:
+  - host: {{ .Values.ApiUrl }}
+    http:
+      paths:
+        - path: {{ $ingressPath }}
+          {{- if $ingressSupportsPathType }}
+          pathType: {{ $ingressPathType }}
+          {{- end }}
+          backend:
+            {{- if $ingressApiIsStable }}
+            service:
+              name: {{ $fullName }}-api
+              port:
+                number: {{ .Values.service.port }}
+            {{- else }}
+            serviceName: {{ $fullName }}-api
+            servicePort: {{ .Values.service.port }}
+            {{- end }}
+{{- end }}

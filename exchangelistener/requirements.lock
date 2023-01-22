@@ -1,0 +1,6 @@
+dependencies:
+- name: exchangelistener
+  repository: file://exchangelistener
+  version: 0.8.74
+digest: sha256:7b21a1392b39e6198e3c8fccabd941749eeea159f7f044800f174aaae36c5b81
+generated: "2023-01-22T14:37:27.506873344+10:00"

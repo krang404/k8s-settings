@@ -1,0 +1,109 @@
+apiVersion: {{ .Values.apiVersion }}
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-api
+spec:
+  serviceName: {{ .Release.Name }}-api
+  selector:
+    matchLabels:
+      app: {{ include "base-service.name" . }}-api
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+{{ include "labels" (dict "root" . "prefix" "api") | indent 8 }}
+      annotations:
+        prometheus.io/scrape: "true"
+    spec:
+      volumes:
+        - name: log4net-exchange-listeners
+          configMap:
+            name: {{ .Release.Name }}-log4net
+            items:
+              - key: log4net.config
+                path: log4net.config
+        - name: appsettings-exchange-listeners
+          configMap:
+            name: {{ .Release.Name }}-appsettings
+            items:
+              - key: appSettings
+                path: appsettings.json
+        - name: rabbitmq-exchange-listeners
+          secret:
+            secretName: {{ include "rabbitmq.secretName" . }}
+            items:
+              - key: appSettings
+                path: rabbitmq.secrets.json
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            timeoutSeconds: 60
+            successThreshold: 1
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 1
+          resources:
+            limits:
+              memory: {{ .Values.resources.statefullset.limits.memory }}
+              cpu: {{ .Values.resources.statefullset.limits.cpu }}
+            requests:
+              memory: 512Mi
+              cpu: 100m
+          volumeMounts: 
+            - name: log4net-exchange-listeners
+              mountPath: {{ include "log4net.mountPath" . }}
+              subPath: log4net.config
+            - name: appsettings-exchange-listeners
+              mountPath: /app/config/appsettings.json
+              subPath: appsettings.json
+            - name: rabbitmq-exchange-listeners
+              mountPath: /app/config/rabbitmq.secrets.json
+              subPath: rabbitmq.secrets.json
+          env:
+            - name: PodName
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: ExchangeListenerRedisHost
+              value: "{{ .Values.env.host }}:{{ .Values.env.port }}"
+            - name: ExchangeListenerRedisDatabase
+              value: "{{ .Values.env.base }}"
+            - name: Log4NetPath
+              value: {{ include "log4net.mountPath" . }}
+{{- range $key, $val := .Values.env }}
+{{- if (and (ne $key "base") (ne $key "host") (ne $key "port")) }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+{{- end }}
+    {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

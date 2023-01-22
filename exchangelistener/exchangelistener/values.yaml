@@ -1,0 +1,66 @@
+image:
+  repository: bpmonline/exchangelistener
+  tag: 0.8.74
+  pullPolicy: IfNotPresent
+replicaCount: 2
+workerReplicaCount: 2
+service:
+  type: ClusterIP
+  port: 8080
+ingress:
+  enabled: false
+  annotations: {}
+  path: /
+  pathType: Prefix
+  tls: []
+ApiUrl: test.domain.com
+apiVersion: apps/v1
+resources:
+  statefullset:
+    limits:
+      cpu: 150m
+      memory: 850Mi
+  worker:
+    limits:
+      cpu: 100m
+      memory: 1000Mi
+env:
+  host: redis-host.external-services
+  port: 6379
+  base: 0
+log4Net:
+  level: INFO
+GrayLog:
+  AMQP:
+    port: 5672
+    virtualHost: /
+    exchange: el-logs
+    routingKey: el-logs
+RabbitMQ:
+  AmqpPort: 5672
+  HttpPort: 15672
+  ExchangeName: NewExchange
+  QueueName: NewQueue
+  Host: rabbitmq
+  HostApi: rabbitmq
+  VirtualHost: /
+  Login: guest
+  Password: guest
+Redis: {}
+Features:
+  UseLockMailboxConnections: true
+nodeSelector: {}
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - k8sm00
+          - k8sm01
+          - k8sm02
+          - k8sw00
+tolerations:
+  - operator: Exists
