@@ -3,6 +3,17 @@ kind: Service
 metadata:
   name: rabbitmq
   namespace: exchange-listener
+annotations:
+    # Тип балансировщика: внутренний.
+    yandex.cloud/load-balancer-type: external
+    # Идентификатор подсети, в которой необходимо выделить IP-адрес для
+    # внутреннего сетевого балансировщика нагрузки.
+    # yandex.cloud/subnet-id: e9b355sqf3lrd32sujsg
+    # HealthChecks
+    yandex.cloud/load-balancer-healthcheck-healthy-threshold: "2"
+    yandex.cloud/load-balancer-healthcheck-interval: "2s"
+    yandex.cloud/load-balancer-healthcheck-timeout: "1s"
+    yandex.cloud/load-balancer-healthcheck-unhealthy-threshold: "2"
 spec:
   type: LoadBalancer
   ports:
