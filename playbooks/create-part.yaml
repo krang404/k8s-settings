@@ -10,7 +10,7 @@
         number: 1
         label: gpt
         state: present
-        part_end: 11GiB
+        part_end: 5GiB
 
     - name: Create a new secondary partition
       parted:
@@ -18,7 +18,7 @@
         number: 2
         label: gpt
         state: present
-        part_start: 11GiB
+        part_start: 5GiB
         part_end: 26GiB
 
     - name: Create a new thirdary partition
@@ -27,7 +27,17 @@
         number: 3
         label: gpt
         state: present
-        part_start: 26GiB
+        part_start: 16GiB
+        part_end: 70Gib
+
+    - name: Create a new thirdary partition
+      parted:
+        device: /dev/vdb
+        number: 4
+        label: gpt
+        state: present
+        part_start: 70GiB
+        part_end: 79Gib
 
     - name: Create a new filesystem in new partition
       filesystem:
@@ -44,6 +54,11 @@
         fstype: ext4
         dev: /dev/vdb3
 
+    - name: Create a new filesystem in new partition
+      filesystem:
+        fstype: ext4
+        dev: /dev/vdb4
+
     - name: Create a mounting point for data disk
       file:
         path: /mnt/disks/fast-disks/vdb1
@@ -57,6 +72,11 @@
     - name: Create a mounting point for data disk
       file:
         path: /mnt/disks/elastik-disks/vdb3
+        state: directory
+
+    - name: Create a mounting point for data disk
+      file:
+        path: /mnt/disks/elastik-disks/vdb4
         state: directory
 
     - name: Mounting disk data to fstab
@@ -75,6 +95,12 @@
       lineinfile:
         dest: /etc/fstab
         line: /dev/vdb3 /mnt/disks/elastik-disks/vdb3 ext4 defaults
+        state: present
+
+    - name: Mounting disk data to fstab
+      lineinfile:
+        dest: /etc/fstab
+        line: /dev/vdb4 /mnt/disks/elastik-disks/vdb4 ext4 defaults
         state: present
 
 
