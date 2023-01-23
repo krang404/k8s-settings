@@ -19,7 +19,7 @@
         label: gpt
         state: present
         part_start: 5GiB
-        part_end: 26GiB
+        part_end: 16GiB
 
     - name: Create a new thirdary partition
       parted:
