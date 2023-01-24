@@ -20,13 +20,13 @@ spec:
              - k8sw00
   tolerations:
     - operator: Exists
-  replicas: 3
+  replicas: 1
   image: rabbitmq:3.11.6
   service:
     type: ClusterIP
   persistence:
     storageClassName: fast-disks
-    storage: 9978Mi
+    storage: 4Gi
   resources:
     requests:
       cpu: 256m
