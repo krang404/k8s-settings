@@ -39,6 +39,15 @@
         part_start: 70GiB
         part_end: 79GiB
 
+    - name: Create a new thirdary partition
+      parted:
+        device: /dev/vdb
+        number: 5
+        label: gpt
+        state: present
+        part_start: 79GiB
+
+
     - name: Create a new filesystem in new partition
       filesystem:
         fstype: ext4
@@ -59,6 +68,11 @@
         fstype: ext4
         dev: /dev/vdb4
 
+    - name: Create a new filesystem in new partition
+      filesystem:
+        fstype: ext4
+        dev: /dev/vdb5
+
     - name: Create a mounting point for data disk
       file:
         path: /mnt/disks/fast-disks/vdb1
@@ -77,6 +91,11 @@
     - name: Create a mounting point for data disk
       file:
         path: /mnt/disks/elastik-disks/vdb4
+        state: directory
+
+    - name: Create a mounting point for data disk
+      file:
+        path: /mnt/disks/elastik-disks/vdb5
         state: directory
 
     - name: Mounting disk data to fstab
@@ -101,6 +120,12 @@
       lineinfile:
         dest: /etc/fstab
         line: /dev/vdb4 /mnt/disks/elastik-disks/vdb4 ext4 defaults
+        state: present
+
+    - name: Mounting disk data to fstab
+      lineinfile:
+        dest: /etc/fstab
+        line: /dev/vdb5 /mnt/disks/elastik-disks/vdb5 ext4 defaults
         state: present
 
 
